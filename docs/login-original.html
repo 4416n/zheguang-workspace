@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>折光 · 登录</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Google Sans Flex"', '"Noto Sans CJK SC"', "sans-serif"],
+            serif: ['"Noto Serif CJK SC"', "serif"],
+          },
+          colors: { brand: "#6366f1", ink: "#1c1e2c", mute: "#56536a" },
+          boxShadow: {
+            glass: "inset 0 1px 0 rgba(255,255,255,.95), 0 24px 40px -28px rgba(52,42,110,.42)",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root { --spring: cubic-bezier(0.34, 1.4, 0.64, 1); --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+
+    .stage {
+      background:
+        linear-gradient(118deg, rgba(99, 102, 241, 0.2), transparent 46%),
+        radial-gradient(42% 48% at 100% 100%, rgba(146, 124, 196, 0.38), transparent 70%),
+        linear-gradient(165deg, #eef1ff 0%, #e6def8 52%, #f3effb 100%);
+      background-size: 160% 160%;
+      animation: pan 26s var(--ease) infinite alternate;
+    }
+
+    .band {
+      position: absolute;
+      left: -20%;
+      top: 38%;
+      width: 140%;
+      height: 180px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.22), rgba(198, 186, 232, 0.36), transparent);
+      filter: blur(24px);
+      animation: drift 22s ease-in-out infinite alternate;
+    }
+
+    .frame {
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(99, 102, 241, 0.28);
+      border-radius: 32px;
+      transform: translate(8px, 8px);
+      pointer-events: none;
+    }
+
+    .glass {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.58));
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 24px 40px -28px rgba(52, 42, 110, 0.42);
+      backdrop-filter: blur(22px) saturate(1.3);
+      -webkit-backdrop-filter: blur(22px) saturate(1.3);
+    }
+
+    .perf {
+      background-image: radial-gradient(circle, rgba(99, 102, 241, 0.55) 1.1px, transparent 1.5px);
+      background-size: 7px 7px;
+      background-repeat: repeat-x;
+      background-position: center bottom;
+    }
+
+    .field {
+      height: 52px;
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(99, 102, 241, 0.16);
+      background: rgba(255, 255, 255, 0.62);
+      padding: 0 16px 0 44px;
+      font-size: 16px;
+      color: #1c1e2c;
+      outline: none;
+      transition: border-color .28s var(--spring), box-shadow .28s var(--spring), transform .28s var(--spring), background .28s ease;
+    }
+    .field::placeholder { color: #8a86a0; }
+    .field:hover { border-color: rgba(99, 102, 241, 0.34); }
+    .field:focus {
+      border-color: #6366f1;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+      transform: scale(1.012);
+    }
+    .field.is-invalid { border-color: rgba(168, 72, 94, 0.55); background: rgba(255, 244, 246, 0.9); }
+    .field:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.92) inset;
+      -webkit-text-fill-color: #1c1e2c;
+    }
+
+    .btn {
+      transition: transform .28s var(--spring), filter .28s var(--spring), box-shadow .28s var(--spring);
+    }
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.02);
+      filter: brightness(1.08);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 16px 28px -14px rgba(99, 102, 241, 0.9);
+    }
+    .btn:active:not(:disabled) { transform: translateY(0) scale(0.985); }
+    .btn:focus-visible { outline: 2px solid #4338ca; outline-offset: 3px; }
+
+    .enter { animation: cardIn .85s var(--ease) both; }
+    .rise { animation: rise .62s var(--ease) both; }
+    .d1 { animation-delay: .08s; } .d2 { animation-delay: .16s; } .d3 { animation-delay: .26s; }
+    .d4 { animation-delay: .34s; } .d5 { animation-delay: .42s; } .d6 { animation-delay: .5s; } .d7 { animation-delay: .58s; }
+    .shake { animation: shake .4s cubic-bezier(.36, .07, .19, .97); }
+
+    @keyframes pan { from { background-position: 0% 40%; } to { background-position: 100% 60%; } }
+    @keyframes drift { from { transform: translate3d(-4%, 0, 0); } to { transform: translate3d(7%, -12px, 0); } }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+    @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-2px); }
+    }
+
+    @media (min-width: 1024px) {
+      .perf {
+        background-repeat: repeat-y;
+        background-position: right center;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .stage, .band, .enter, .rise, .shake { animation: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-dvh bg-[#e7e4f6] font-sans text-ink antialiased">
+  <div class="stage fixed inset-0 -z-10 overflow-hidden" aria-hidden="true"><div class="band"></div></div>
+
+  <main class="mx-auto grid min-h-dvh w-full max-w-[1080px] items-center gap-8 px-5 py-8 sm:px-8 lg:grid-cols-[1.08fr_.92fr] lg:gap-16 lg:py-12">
+    <section class="enter max-w-xl">
+      <p class="rise d1 text-[11px] tracking-[0.28em] text-[#6d6a82]">01 / ENTER</p>
+      <div class="rise d2 mt-4 flex items-center gap-3 text-sm tracking-wide text-[#3c3a50]">
+        <span class="grid h-10 w-10 place-items-center rounded-2xl border border-white/80 bg-white/55 text-brand shadow-sm">
+          <svg viewBox="0 0 32 32" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+            <path d="M8 7h10l6 6v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z"></path>
+            <path d="M18 7v6h6"></path>
+          </svg>
+        </span>
+        折光
+      </div>
+      <h1 class="rise d3 mt-6 border-l-2 border-brand/40 pl-5 font-serif text-4xl font-medium leading-[1.18] lg:text-[64px]">
+        欢迎回来<br /><span class="text-brand">只开一扇门</span>
+      </h1>
+      <p class="rise d4 mt-5 max-w-xs text-[15px] leading-7 text-mute">带上账号和密码。门后是工作台，其余先留在外面。</p>
+    </section>
+
+    <div class="enter d2 relative mx-auto w-full max-w-[440px] lg:mx-0 lg:ml-auto">
+      <div class="frame" aria-hidden="true"></div>
+      <section id="ticket" class="glass relative grid overflow-hidden rounded-[32px] border border-white/90 lg:grid-cols-[96px_1fr]">
+        <aside class="perf flex items-center justify-center gap-3 px-4 py-3.5 text-[#3e3c54] lg:flex-col lg:px-0 lg:py-8" aria-hidden="true">
+          <span class="text-[10px] tracking-[0.22em] text-[#6d6a82] lg:[writing-mode:vertical-rl]">NO.01</span>
+          <span class="font-serif text-sm tracking-[0.42em] lg:text-base lg:tracking-[0.62em] lg:[writing-mode:vertical-rl]">入场券</span>
+        </aside>
+
+        <form id="login" class="px-5 py-6 sm:px-7 sm:py-8" novalidate>
+          <header class="rise d3">
+            <h2 class="font-serif text-[28px] font-medium leading-none">登录</h2>
+            <p class="mt-2 text-sm text-mute">工作台只认这一次</p>
+          </header>
+
+          <label class="rise d4 mt-6 block">
+            <span class="mb-2 block text-sm text-[#3f3d54]">账号</span>
+            <span class="relative block">
+              <svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b87a1]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <circle cx="12" cy="8" r="3.2"></circle>
+                <path d="M5.5 19.2c1.4-3 3.6-4.4 6.5-4.4s5.1 1.4 6.5 4.4"></path>
+              </svg>
+              <input class="field" data-field data-empty="请填写账号" name="account" type="text" autocomplete="username" placeholder="邮箱或用户名" />
+            </span>
+            <p class="invisible h-5 pt-1 text-xs text-[#a24b5e]" data-error></p>
+          </label>
+
+          <label class="rise d5 block">
+            <span class="mb-2 flex items-center justify-between text-sm text-[#3f3d54]">
+              密码
+              <a href="#" class="text-xs text-brand transition hover:brightness-90">忘记密码</a>
+            </span>
+            <span class="relative block">
+              <svg class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#8b87a1]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                <rect x="5" y="11" width="14" height="9" rx="2"></rect>
+                <path d="M8 11V8.5a4 4 0 0 1 8 0V11"></path>
+              </svg>
+              <input class="field" data-field data-empty="请填写密码" name="password" type="password" autocomplete="current-password" placeholder="输入密码" />
+            </span>
+            <p class="invisible h-5 pt-1 text-xs text-[#a24b5e]" data-error></p>
+          </label>
+
+          <label class="rise d6 mb-5 mt-1 flex items-center gap-2.5 text-sm text-mute">
+            <input type="checkbox" name="remember" class="h-4 w-4 accent-brand" />
+            30 天内保持登录
+          </label>
+
+          <div class="rise d7">
+            <button class="btn flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl bg-brand text-[15px] font-medium text-white shadow-[inset_0_1px_0_rgba(255,255,255,.35),0_14px_26px_-16px_rgba(99,102,241,.95)] disabled:cursor-progress" type="submit">
+              <span data-label>进入折光</span>
+              <svg data-spin class="hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle class="opacity-25" cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3"></circle>
+                <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+              </svg>
+            </button>
+            <p class="pt-4 text-center text-sm text-mute">还没有账号？ <a href="#" class="text-brand">注册</a></p>
+          </div>
+        </form>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const form = document.querySelector("#login");
+    const ticket = document.querySelector("#ticket");
+    const fields = [...form.querySelectorAll("[data-field]")];
+    const button = form.querySelector("button");
+    const label = button.querySelector("[data-label]");
+    const spin = button.querySelector("[data-spin]");
+
+    const clearError = (input) => {
+      input.classList.remove("is-invalid");
+      input.removeAttribute("aria-invalid");
+      const error = input.closest("label").querySelector("[data-error]");
+      error.textContent = "";
+      error.classList.add("invisible");
+    };
+
+    const showError = (input) => {
+      input.classList.add("is-invalid");
+      input.setAttribute("aria-invalid", "true");
+      const error = input.closest("label").querySelector("[data-error]");
+      error.textContent = input.dataset.empty;
+      error.classList.remove("invisible");
+    };
+
+    fields.forEach((input) => input.addEventListener("input", () => clearError(input)));
+    ticket.addEventListener("animationend", () => ticket.classList.remove("shake"));
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      let firstInvalid = null;
+      fields.forEach((input) => {
+        if (!input.value.trim()) {
+          showError(input);
+          firstInvalid ??= input;
+        } else clearError(input);
+      });
+
+      if (firstInvalid) {
+        ticket.classList.remove("shake");
+        void ticket.offsetWidth;
+        ticket.classList.add("shake");
+        firstInvalid.focus();
+        return;
+      }
+
+      button.disabled = true;
+      label.textContent = "正在进入";
+      spin.classList.remove("hidden");
+      window.setTimeout(() => {
+        label.textContent = "进入折光";
+        spin.classList.add("hidden");
+        button.disabled = false;
+      }, 1100);
+    });
+  </script>
+</body>
+</html>

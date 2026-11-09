@@ -1,0 +1,38 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.aws/
+
+# Runtime data and database backups
+/data/
+/backups/
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+
+# Dependencies, generated packages and test output
+node_modules/
+/dist/
+coverage/
+test-results/
+playwright-report/
+*.log
+.npm/
+
+# Local editor, agent and desktop state
+.idea/
+.vscode/
+.codex/
+.agents/
+.directory
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~

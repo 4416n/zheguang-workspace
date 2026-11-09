@@ -1,0 +1,16 @@
+{
+  "name": "zheguang-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "折光 · 项目与任务协作工作台",
+  "keywords": ["project-management", "task-board", "collaboration", "sqlite"],
+  "engines": { "node": ">=22.13.0" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js",
+    "test": "node --test tests/*.test.js",
+    "check": "node --check server.js && node --check server/app.js && node --check server/db.js && node --check server/security.js && node --check public/app.js",
+    "verify": "npm run check && npm test"
+  }
+}
